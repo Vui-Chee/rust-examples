@@ -2,7 +2,6 @@ use std::collections::HashSet;
 
 pub fn isvalid_sudoku(grid: [[u32; 9]; 9]) -> bool {
     let n = grid.len();
-    let mut isvalid = true;
 
     for i in 0..n {
         let row: HashSet<_> = grid[i].iter().filter(|&x| *x != 0).collect();
@@ -16,10 +15,12 @@ pub fn isvalid_sudoku(grid: [[u32; 9]; 9]) -> bool {
             .filter(|&x| x != 0)
             .collect();
 
-        isvalid = row.len() == n && col.len() == n && square.len() == n;
+        if row.len() != n || col.len() != n || square.len() != n {
+            return false;
+        }
     }
 
-    isvalid
+    true
 }
 
 #[cfg(test)]
