@@ -1,10 +1,14 @@
 use super::helpers::ExtendedIterator;
+use rand::prelude::*;
+use rand::thread_rng;
 use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct State {
     pub steps: u32,
     pub cells: [[u8; 9]; 9],
+
+    pub rng: ThreadRng,
 }
 
 pub fn render_sudoku(grid: [[u8; 9]; 9]) -> String {
@@ -68,11 +72,14 @@ pub fn solve(mut i: usize, mut j: usize, state: &mut State) -> bool {
         }
     }
 
+    // Already filled, move to next cell.
     if state.cells[i][j] != 0 {
         return solve(i + 1, j, state);
     }
 
-    for value in 1..10 {
+    let mut values: [u8; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    values.shuffle(&mut state.rng);
+    for &value in values.iter() {
         state.cells[i][j] = value;
 
         if isvalid_sudoku(state.cells) && solve(i + 1, j, state) {
@@ -83,6 +90,33 @@ pub fn solve(mut i: usize, mut j: usize, state: &mut State) -> bool {
     state.cells[i][j] = 0;
 
     false
+}
+
+pub fn generate_sudoku(num_to_skip: usize) -> [[u8; 9]; 9] {
+    let mut positions = Vec::<u8>::new();
+
+    for index in 0..81 {
+        positions.push(index);
+    }
+
+    let mut rng = thread_rng();
+    positions.shuffle(&mut rng);
+
+    let grid: [[u8; 9]; 9] = [[0; 9]; 9];
+
+    let mut state = State {
+        steps: 0,
+        cells: grid,
+        rng: thread_rng(),
+    };
+
+    solve(0, 0, &mut state);
+
+    for index in positions.iter().take(num_to_skip) {
+        state.cells[(index / 9) as usize][(index % 9) as usize] = 0;
+    }
+
+    state.cells
 }
 
 #[cfg(test)]
@@ -108,6 +142,31 @@ mod tests {
     }
 
     #[test]
+    fn test_solve_empty_sudoku() {
+        let grid: [[u8; 9]; 9] = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ];
+
+        let mut state = State {
+            steps: 0,
+            cells: grid,
+            rng: rand::thread_rng(),
+        };
+
+        let result = solve(0, 0, &mut state);
+
+        assert!(result);
+    }
+
+    #[test]
     fn test_solve_sudoku() {
         let grid: [[u8; 9]; 9] = [
             [3, 0, 6, 5, 0, 8, 4, 0, 0],
@@ -124,10 +183,10 @@ mod tests {
         let mut state = State {
             steps: 0,
             cells: grid,
+            rng: rand::thread_rng(),
         };
 
         let result = solve(0, 0, &mut state);
-        println!("{} {:?}", state.steps, state.cells);
 
         assert!(result);
 
