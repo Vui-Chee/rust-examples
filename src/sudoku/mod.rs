@@ -1,6 +1,5 @@
 use super::helpers::ExtendedIterator;
 use rand::prelude::*;
-use rand::thread_rng;
 use std::collections::HashSet;
 
 #[derive(Debug)]
@@ -93,15 +92,7 @@ pub fn solve(mut i: usize, mut j: usize, state: &mut State) -> bool {
 }
 
 pub fn generate_sudoku(num_to_skip: usize) -> [[u8; 9]; 9] {
-    let mut positions = Vec::<u8>::new();
-
-    for index in 0..81 {
-        positions.push(index);
-    }
-
-    let mut rng = thread_rng();
-    positions.shuffle(&mut rng);
-
+    // Randomly solve an empty grid first.
     let grid: [[u8; 9]; 9] = [[0; 9]; 9];
 
     let mut state = State {
@@ -112,6 +103,15 @@ pub fn generate_sudoku(num_to_skip: usize) -> [[u8; 9]; 9] {
 
     solve(0, 0, &mut state);
 
+    // Shuffle array indices for positions to skip.
+    let mut positions = Vec::<u8>::new();
+    for index in 0..81 {
+        positions.push(index);
+    }
+    let mut rng = thread_rng();
+    positions.shuffle(&mut rng);
+
+    // Set those randomly chosen positions to 0.
     for index in positions.iter().take(num_to_skip) {
         state.cells[(index / 9) as usize][(index % 9) as usize] = 0;
     }
