@@ -124,6 +124,26 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_generate_sudoku() {
+        // Create partial grid with 30 filled cells.
+        let num_to_skip = 51;
+        let grid = generate_sudoku(num_to_skip);
+        assert!(isvalid_sudoku(grid));
+
+        // Check if there are exactly 30 filled cells.
+        let mut num_empty = 0;
+        for row in grid.iter() {
+            for &elem in row.iter() {
+                if elem == 0 {
+                    num_empty += 1;
+                }
+            }
+        }
+
+        assert_eq!(num_empty, num_to_skip);
+    }
+
+    #[test]
     fn test_partial_sudoku() {
         // Should be valid
         let grid: [[u8; 9]; 9] = [
