@@ -56,8 +56,19 @@ mod helper_test {
     use super::*;
 
     #[test]
-    fn check_iterator_methods() {
-        // let arr = vec![1, 2, 3, 4];
-        // let ext_arr = ExtendedIterator { values: arr };
+    fn test_mk_string() {
+        let arr: [u8; 3] = [1, 2, 3];
+        let output_str = arr.iter().mk_string("<", "-", ">");
+        assert_eq!(output_str, "<1-2-3>");
+    }
+
+    #[test]
+    fn test_grouped() {
+        let arr: [u8; 5] = [1, 2, 3, 4, 5];
+        let groups = arr.iter().grouped(2);
+        assert_eq!(groups.len(), 3);
+        assert_eq!(groups.as_slice()[0].len(), 2);
+        assert_eq!(groups.as_slice()[1].len(), 2);
+        assert_eq!(groups.as_slice()[2].len(), 1);
     }
 }
