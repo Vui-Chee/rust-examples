@@ -1,6 +1,9 @@
 use super::helpers::ExtendedIterator;
+use crossterm::{terminal, ExecutableCommand};
 use rand::prelude::*;
 use std::collections::HashSet;
+use std::io::{stdout, Write};
+use std::{thread, time};
 
 #[derive(Debug)]
 pub struct State {
@@ -8,6 +11,21 @@ pub struct State {
     pub cells: [[u8; 9]; 9],
 
     pub rng: ThreadRng,
+    pub allow_render: bool,
+}
+
+impl State {
+    pub fn render_state(&self) {
+        if self.allow_render {
+            let mut stdout = stdout();
+            stdout.write_all(render_sudoku(self.cells).as_bytes()).ok();
+            let wait_time = time::Duration::from_millis(10);
+            thread::sleep(wait_time);
+            stdout
+                .execute(terminal::Clear(terminal::ClearType::All))
+                .ok();
+        }
+    }
 }
 
 pub fn render_sudoku(grid: [[u8; 9]; 9]) -> String {
@@ -62,6 +80,8 @@ pub fn isvalid_sudoku(grid: [[u8; 9]; 9]) -> bool {
 pub fn solve(mut i: usize, mut j: usize, state: &mut State) -> bool {
     state.steps += 1;
 
+    state.render_state();
+
     if i == 9 {
         j += 1;
         if j == 9 {
@@ -99,9 +119,10 @@ pub fn generate_sudoku(num_to_skip: usize) -> [[u8; 9]; 9] {
         steps: 0,
         cells: grid,
         rng: thread_rng(),
+        allow_render: false,
     };
 
-    solve(0, 0, &mut state);
+    let _result = solve(0, 0, &mut state);
 
     // Shuffle array indices for positions to skip.
     let mut positions = Vec::<u8>::new();
@@ -117,6 +138,24 @@ pub fn generate_sudoku(num_to_skip: usize) -> [[u8; 9]; 9] {
     }
 
     state.cells
+}
+
+pub fn run() {
+    let mut rng = rand::thread_rng();
+    let random_unfills = rng.gen_range(20, 40);
+
+    let grid = generate_sudoku(random_unfills);
+    let mut state = State {
+        steps: 0,
+        cells: grid,
+        rng: rand::thread_rng(),
+        allow_render: true,
+    };
+
+    solve(0, 0, &mut state);
+
+    println!("INITIAL{}", render_sudoku(grid));
+    println!("SOLVED{}", render_sudoku(state.cells));
 }
 
 #[cfg(test)]
@@ -179,6 +218,7 @@ mod tests {
             steps: 0,
             cells: grid,
             rng: rand::thread_rng(),
+            allow_render: false,
         };
 
         let result = solve(0, 0, &mut state);
@@ -204,6 +244,7 @@ mod tests {
             steps: 0,
             cells: grid,
             rng: rand::thread_rng(),
+            allow_render: false,
         };
 
         let result = solve(0, 0, &mut state);
