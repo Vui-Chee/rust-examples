@@ -62,13 +62,22 @@ mod helper_test {
         assert_eq!(output_str, "<1-2-3>");
     }
 
-    #[test]
-    fn test_grouped() {
-        let arr: [u8; 5] = [1, 2, 3, 4, 5];
-        let groups = arr.iter().grouped(2);
-        assert_eq!(groups.len(), 3);
-        assert_eq!(groups.as_slice()[0].len(), 2);
-        assert_eq!(groups.as_slice()[1].len(), 2);
-        assert_eq!(groups.as_slice()[2].len(), 1);
+    #[quickcheck]
+    fn test_grouped(arr: Vec<isize>, group_size: usize) -> bool {
+        if group_size <= 0 || arr.len() <= 0 {
+            return true;
+        }
+
+        let groups = arr.iter().grouped(group_size);
+
+        // Calc number of proper groups to iterate over
+
+        for i in 0..(groups.len() / group_size) {
+            if groups.as_slice()[i].len() != group_size {
+                return false;
+            }
+        }
+
+        groups.len() == ((arr.len() + group_size - 1) / group_size)
     }
 }
