@@ -1,5 +1,6 @@
 /// Computes the nth fibonacci number by
 /// repeating [f(n-1), f(n)] * [[0, 1], [1, 1]].
+#[allow(dead_code)]
 pub fn fibonacci(n: usize) -> usize {
     let mut state: [usize; 2] = [0, 1];
 

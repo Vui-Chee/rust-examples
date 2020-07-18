@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub fn merge<T>(arr: &mut [T], s1: usize, s2: usize, end: usize)
 where
     T: Ord + Copy,
@@ -31,6 +32,7 @@ where
 }
 
 /// Merge sort in place
+#[allow(dead_code)]
 pub fn merge_sort<T>(arr: &mut [T], start: usize, end: usize)
 where
     T: Ord + Copy,
