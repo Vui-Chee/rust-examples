@@ -55,11 +55,20 @@ where
 mod helper_test {
     use super::*;
 
-    #[test]
-    fn test_mk_string() {
-        let arr: [u8; 3] = [1, 2, 3];
-        let output_str = arr.iter().mk_string("<", "-", ">");
-        assert_eq!(output_str, "<1-2-3>");
+    #[quickcheck]
+    fn test_mk_string(arr: Vec<isize>) -> bool {
+        let mut expected = String::with_capacity(arr.len() * 2 + 1);
+
+        expected.push('<');
+        for (index, &val) in arr.iter().enumerate() {
+            if index > 0 {
+                expected.push('-');
+            }
+            expected.push_str(&val.to_string());
+        }
+        expected.push('>');
+
+        arr.iter().mk_string("<", "-", ">") == expected
     }
 
     #[quickcheck]
@@ -71,7 +80,6 @@ mod helper_test {
         let groups = arr.iter().grouped(group_size);
 
         // Calc number of proper groups to iterate over
-
         for i in 0..(groups.len() / group_size) {
             if groups.as_slice()[i].len() != group_size {
                 return false;
