@@ -1,5 +1,8 @@
-pub fn merge(arr: &mut [u16], s1: usize, s2: usize, end: usize) {
-    let mut temp = Vec::<u16>::new();
+pub fn merge<T>(arr: &mut [T], s1: usize, s2: usize, end: usize)
+where
+    T: Ord + Copy,
+{
+    let mut temp = Vec::<T>::new();
 
     // Copy first sorted array into temp vector.
     for index in s1..s2 {
@@ -28,7 +31,10 @@ pub fn merge(arr: &mut [u16], s1: usize, s2: usize, end: usize) {
 }
 
 /// Merge sort in place
-pub fn merge_sort(arr: &mut [u16], start: usize, end: usize) {
+pub fn merge_sort<T>(arr: &mut [T], start: usize, end: usize)
+where
+    T: Ord + Copy,
+{
     if start >= end {
         return;
     }
@@ -36,7 +42,7 @@ pub fn merge_sort(arr: &mut [u16], start: usize, end: usize) {
     let mid = (start + end) / 2;
     merge_sort(arr, start, mid);
     merge_sort(arr, mid + 1, end);
-    merge(arr, start, mid + 1, end);
+    merge::<T>(arr, start, mid + 1, end);
 }
 
 #[cfg(test)]
@@ -44,15 +50,18 @@ mod tests {
     use super::merge_sort;
 
     #[quickcheck]
-    fn test_merge_sort_with_random_arr(xs: Vec<u16>) -> bool {
+    fn test_merge_sort_with_random_arr(xs: Vec<isize>) -> bool {
         let mut arr = xs.to_owned();
         let size = arr.len();
+
+        // Cannot run on empty array - like what for?
         if size <= 0 {
             return true;
         }
 
         merge_sort(&mut arr, 0, size - 1);
 
+        // Check ordering.
         for i in 0..size - 1 {
             if arr[i] > arr[i + 1] {
                 return false;
