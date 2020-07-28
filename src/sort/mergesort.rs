@@ -33,7 +33,7 @@ where
 
 /// Merge sort in place
 #[allow(dead_code)]
-pub fn merge_sort<T>(arr: &mut [T], start: usize, end: usize)
+pub fn mergesort<T>(arr: &mut [T], start: usize, end: usize)
 where
     T: Ord + Copy,
 {
@@ -42,17 +42,17 @@ where
     }
 
     let mid = (start + end) / 2;
-    merge_sort(arr, start, mid);
-    merge_sort(arr, mid + 1, end);
+    mergesort(arr, start, mid);
+    mergesort(arr, mid + 1, end);
     merge::<T>(arr, start, mid + 1, end);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::merge_sort;
+    use super::mergesort;
 
     #[quickcheck]
-    fn test_merge_sort_with_random_arr(xs: Vec<isize>) -> bool {
+    fn test_mergesort(xs: Vec<isize>) -> bool {
         let mut arr = xs.to_owned();
         let size = arr.len();
 
@@ -61,7 +61,7 @@ mod tests {
             return true;
         }
 
-        merge_sort(&mut arr, 0, size - 1);
+        mergesort(&mut arr, 0, size - 1);
 
         // Check ordering.
         for i in 0..size - 1 {
