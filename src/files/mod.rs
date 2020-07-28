@@ -19,3 +19,31 @@ pub fn largest_files(src: &str, n: usize) -> Result<Vec<fs::DirEntry>> {
 
     Ok(entries)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::largest_files;
+    use std::env::current_dir;
+
+    #[test]
+    fn test_largest_files() {
+        let test_dir = format!(
+            "{}{}",
+            current_dir().unwrap().to_str().unwrap(),
+            "/src/files/test_files"
+        );
+        let res = largest_files(&test_dir, 0);
+        assert_eq!(res.unwrap().len(), 0);
+        let res = largest_files(&test_dir, 3);
+        assert_eq!(res.unwrap().len(), 3);
+        let res = largest_files(&test_dir, 5);
+        assert_eq!(res.unwrap().len(), 3);
+        let res = largest_files(&test_dir, 3);
+        if let Ok(entries) = res {
+            let entries_slice = entries.as_slice();
+            assert_eq!(entries_slice[0].file_name(), "file1.txt");
+            assert_eq!(entries_slice[1].file_name(), "file3.txt");
+            assert_eq!(entries_slice[2].file_name(), "file2.txt");
+        }
+    }
+}
