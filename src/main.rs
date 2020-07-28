@@ -45,7 +45,6 @@ fn main() -> Result<()> {
     if let Some(_matches) = matches.subcommand_matches("largest_files") {
         if let Some(home) = home_dir() {
             let home_path = home.to_str().unwrap_or("");
-            format!("{}", home_path);
             let entries = files::largest_files(home_path, 5)?;
             for entry in entries {
                 println!("{:?}", entry);
