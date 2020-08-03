@@ -75,53 +75,49 @@ mod tests {
 
     #[test]
     fn test_sync() {
-        assert!(match current_dir().unwrap().to_str() {
-            Some(current_dir) => {
-                // Generate test directory
-                let dest_path = format!("{}/{}", current_dir, "out");
-                let dest = Path::new(&dest_path);
-                if !dest.exists() {
-                    fs::create_dir(dest).unwrap();
-                }
-
-                // First level file
-                if !dest.join("folder1").exists() {
-                    fs::create_dir(dest.join("folder1")).unwrap();
-                }
-                fs::write(dest.join("folder1/hello.txt"), "HELLO").unwrap();
-
-                // Nested file (second level)
-                if !dest.join("folder1/nested").exists() {
-                    fs::create_dir(dest.join("folder1/nested")).unwrap();
-                }
-                fs::write(dest.join("folder1/nested/world.txt"), "WORLD").unwrap();
-
-                // First sync
-                sync(&dest_path, &dest_path);
-
-                assert_eq!(
-                    from_utf8(
-                        fs::read(format!("{}/{}", dest_path, "folder1/hello.txt"))
-                            .unwrap()
-                            .as_slice()
-                    )
-                    .unwrap(),
-                    "HELLO"
-                );
-                assert_eq!(
-                    from_utf8(
-                        fs::read(format!("{}/{}", dest_path, "folder1/nested/world.txt"))
-                            .unwrap()
-                            .as_slice()
-                    )
-                    .unwrap(),
-                    "WORLD"
-                );
-
-                // Everything succeeded
-                true
+        if let Some(current_dir) = current_dir().unwrap().to_str() {
+            // Generate test directory
+            let dest_path = format!("{}/{}", current_dir, "out");
+            let dest = Path::new(&dest_path);
+            if !dest.exists() {
+                fs::create_dir(dest).unwrap();
             }
-            None => false,
-        });
+
+            // First level file
+            if !dest.join("folder1").exists() {
+                fs::create_dir(dest.join("folder1")).unwrap();
+            }
+            fs::write(dest.join("folder1/hello.txt"), "HELLO").unwrap();
+
+            // Nested file (second level)
+            if !dest.join("folder1/nested").exists() {
+                fs::create_dir(dest.join("folder1/nested")).unwrap();
+            }
+            fs::write(dest.join("folder1/nested/world.txt"), "WORLD").unwrap();
+
+            // First sync
+            sync(&dest_path, &dest_path);
+
+            assert_eq!(
+                from_utf8(
+                    fs::read(format!("{}/{}", dest_path, "folder1/hello.txt"))
+                        .unwrap()
+                        .as_slice()
+                )
+                .unwrap(),
+                "HELLO"
+            );
+            assert_eq!(
+                from_utf8(
+                    fs::read(format!("{}/{}", dest_path, "folder1/nested/world.txt"))
+                        .unwrap()
+                        .as_slice()
+                )
+                .unwrap(),
+                "WORLD"
+            );
+        } else {
+            panic!("Failed to read current directory.");
+        }
     }
 }
