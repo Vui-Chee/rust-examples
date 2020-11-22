@@ -3,7 +3,7 @@ use super::Sorter;
 struct MergeSort;
 
 impl MergeSort {
-    fn merge<T>(arr: &mut [T], s1: usize, s2: usize, end: usize)
+    fn merge<T>(&self, arr: &mut [T], s1: usize, s2: usize, end: usize)
     where
         T: Ord + Copy,
     {
@@ -35,7 +35,7 @@ impl MergeSort {
         }
     }
 
-    pub fn merge_sort_helper<T>(arr: &mut [T], start: usize, end: usize)
+    pub fn merge_sort_helper<T>(&self, arr: &mut [T], start: usize, end: usize)
     where
         T: Ord + Copy,
     {
@@ -44,34 +44,34 @@ impl MergeSort {
         }
 
         let mid = (start + end) / 2;
-        MergeSort::merge_sort_helper(arr, start, mid);
-        MergeSort::merge_sort_helper(arr, mid + 1, end);
-        MergeSort::merge::<T>(arr, start, mid + 1, end);
+        MergeSort.merge_sort_helper(arr, start, mid);
+        MergeSort.merge_sort_helper(arr, mid + 1, end);
+        MergeSort.merge::<T>(arr, start, mid + 1, end);
     }
 }
 
 impl Sorter for MergeSort {
-    fn sort<T>(arr: &mut [T])
+    fn sort<T>(&self, arr: &mut [T])
     where
         T: Ord + Copy,
     {
         if arr.len() > 0 {
-            MergeSort::merge_sort_helper(arr, 0, arr.len() - 1);
+            MergeSort.merge_sort_helper(arr, 0, arr.len() - 1);
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::sort;
     use super::MergeSort;
+    use super::Sorter; // Reveal trait for sort() method
 
     #[quickcheck]
     fn test_mergesort(xs: Vec<isize>) -> bool {
         let mut arr = xs.to_owned();
         let size = arr.len();
 
-        sort::<_, MergeSort>(&mut arr);
+        MergeSort.sort(&mut arr);
 
         if size > 0 {
             // Check ordering.
