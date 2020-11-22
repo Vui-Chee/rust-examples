@@ -67,6 +67,39 @@ mod tests {
     use super::Sorter; // Reveal trait for sort() method
 
     #[quickcheck]
+    fn test_merge(xs: Vec<isize>, ys: Vec<isize>) -> bool {
+        // Both vectors sorted before merging.
+        let mut xs = xs.clone();
+        let mut ys = ys.clone();
+        xs.sort();
+        ys.sort();
+
+        let mut combined = vec![];
+        for elem in xs.iter() {
+            combined.push(elem);
+        }
+        for elem in ys.iter() {
+            combined.push(elem);
+        }
+
+        let arr = combined.as_mut_slice();
+        MergeSort.merge(
+            arr,
+            0,
+            xs.len(),
+            arr.len().checked_sub(1).unwrap_or_default(),
+        );
+
+        // Check if final combined arr is sorted.
+        arr.iter().enumerate().all(|(i, x)| {
+            if i > 0 {
+                return &arr[i - 1] <= x;
+            }
+            true
+        })
+    }
+
+    #[quickcheck]
     fn test_mergesort(xs: Vec<isize>) -> bool {
         let mut arr = xs.to_owned();
         let size = arr.len();
